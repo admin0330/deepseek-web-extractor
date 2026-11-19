@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "EchoArchive · DeepSeek 对话本地导出",
+  "version": "1.0.0",
+  "description": "开源的 DeepSeek 对话本地导出扩展：全量导出 Markdown / JSON / AES-256-GCM 本地加密包，零联网、不读取 Cookie。",
+  "permissions": [
+    "sidePanel",
+    "activeTab",
+    "scripting",
+    "downloads",
+    "storage",
+    "offscreen"
+  ],
+  "host_permissions": [
+    "https://chat.deepseek.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "side_panel": {
+    "default_path": "src/sidepanel.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chat.deepseek.com/*"
+      ],
+      "js": [
+        "src/crypto_utils.js",
+        "src/export_core.js",
+        "src/content_extractor.js",
+        "src/content_capsule.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "打开 EchoArchive 常驻侧栏",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png"
+    }
+  }
+}

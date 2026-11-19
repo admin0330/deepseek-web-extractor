@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EchoArchive</title>
+  <link rel="stylesheet" href="sidepanel.css" />
+</head>
+<body>
+  <div class="dock">
+    <!-- Masthead -->
+    <header class="masthead">
+      <div class="brand-group">
+        <div class="mark" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <rect x="2.25" y="2.25" width="13.5" height="13.5" rx="2" stroke="currentColor" stroke-width="1.35" />
+            <path d="M5.5 6.5H12.5M5.5 9.25H12.5M5.5 12H9.5" stroke="currentColor" stroke-width="1.35" stroke-linecap="square" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="title">EchoArchive</h1>
+          <div class="sub-tag">DeepSeek 本地归档</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Cached Job Banner -->
+    <section id="cachedBanner" class="cached-banner" hidden>
+      <div class="cached-text">
+        <strong id="cachedTitle">已采集待保存</strong>
+        <span id="cachedMeta">可直接导出，无需重扫</span>
+      </div>
+      <div class="cached-btns">
+        <button id="useCachedEncBtn" class="btn-mini-solid" type="button">导出加密包</button>
+        <button id="useCachedMdBtn" class="btn-mini-outline" type="button">导 MD</button>
+        <button id="discardCachedBtn" class="btn-mini-outline" type="button">丢弃</button>
+      </div>
+    </section>
+
+    <!-- 01. Session Card -->
+    <section id="sessionCard" class="panel session-card">
+      <div class="panel-head">
+        <span class="panel-title">当前对话</span>
+        <div class="panel-meta">
+          <span id="countPill" class="count-pill">检测中</span>
+          <button id="inspectBtn" class="icon-btn" type="button" title="重新检测">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+              <path d="M13.5 8A5.5 5.5 0 1 1 11.9 4.1M13.5 2.5V5.5H10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="sessionHeadline" class="session-headline">等待连接当前标签页</div>
+      <div id="sessionExcerpt" class="session-excerpt">打开任意 DeepSeek 对话即可导出。</div>
+    </section>
+
+    <!-- 02. Export Console -->
+    <section class="panel">
+      <div class="panel-head">
+        <span class="panel-title">导出</span>
+        <span class="tier-hint">默认免密自加密 .echo 包</span>
+      </div>
+
+      <div class="action-stack">
+        <button id="exportEncBtn" class="btn-solid" type="button">
+          <span id="encBtnLabel">一键导出加密包 (.echo · 默认)</span>
+        </button>
+        <button id="exportMdBtn" class="btn-outline" type="button">
+          导出 Markdown (.md)
+        </button>
+      </div>
+
+      <!-- Live Progress Drawer -->
+      <div id="progressCard" class="progress-card" hidden>
+        <div class="prog-top">
+          <span id="progPhase" class="prog-phase">正在采集…</span>
+          <button id="cancelJobBtn" class="btn-mini-outline" type="button">中止</button>
+        </div>
+        <div class="prog-track"><div id="progFill" class="prog-fill"></div></div>
+        <div id="progStats" class="prog-stats">已采集 0 条</div>
+      </div>
+
+      <div id="statusBar" class="status-bar" aria-live="polite"></div>
+    </section>
+
+    <!-- 03. Collapsed Expert Drawer -->
+    <details class="expert-drawer">
+      <summary>
+        <span>高级选项</span>
+        <span class="plus-mark">+</span>
+      </summary>
+
+      <div class="drawer-grid"><div class="drawer-clip">
+      <div class="drawer-body">
+        <div class="switch-list">
+          <label class="switch-row">
+            <div class="switch-copy">
+              <span>回溯完整长对话</span>
+              <small>自动滚动加载全部历史</small>
+            </div>
+            <span class="toggle">
+              <input id="autoScrollChk" type="checkbox" checked />
+              <span class="toggle-track"></span>
+            </span>
+          </label>
+
+          <label class="switch-row">
+            <div class="switch-copy">
+              <span>展开折叠思考</span>
+              <small>采集前点开隐藏的思考过程</small>
+            </div>
+            <span class="toggle">
+              <input id="expandThinkChk" type="checkbox" checked />
+              <span class="toggle-track"></span>
+            </span>
+          </label>
+
+          <label class="switch-row">
+            <div class="switch-copy">
+              <span>屏蔽手机号 / 邮箱 / 身份证</span>
+              <small>本地生成可逆还原表</small>
+            </div>
+            <span class="toggle">
+              <input id="maskPiiChk" type="checkbox" checked />
+              <span class="toggle-track"></span>
+            </span>
+          </label>
+        </div>
+
+        <button id="exportJsonBtn" class="btn-outline" type="button">
+          导出结构化 JSON (.json)
+        </button>
+
+        <div class="sub-block">
+          <div class="pass-label-row">
+            <label for="passphraseInput">自定义导出口令（可选 · 留空默认免密自加密）</label>
+            <span id="passStrengthLabel" class="strength-label"></span>
+          </div>
+          <div class="pass-input-shell">
+            <input id="passphraseInput" type="password" placeholder="留空自动封装；填 4 位以上则改为口令加密" autocomplete="off" />
+            <button id="togglePassBtn" class="eye-btn" type="button" title="显示或隐藏口令" aria-label="切换口令可见性">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                <path d="M1.5 8C2.8 4.8 5.2 3.2 8 3.2C10.8 3.2 13.2 4.8 14.5 8C13.2 11.2 10.8 12.8 8 12.8C5.2 12.8 2.8 11.2 1.5 8Z" stroke="currentColor" stroke-width="1.3" />
+                <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3" />
+              </svg>
+            </button>
+          </div>
+          <div class="strength-bars" aria-hidden="true">
+            <span id="sb1"></span><span id="sb2"></span><span id="sb3"></span>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-head">
+            <span>本地验真 / 解封 .echo 包</span>
+          </div>
+          <input id="unpackEchoFile" type="file" accept=".echo,.json" hidden />
+          <button id="unpackEchoBtn" class="btn-outline" type="button">选择 .echo 包识别加密标记并转出 MD</button>
+          <div id="unpackOutput" class="probe-output"></div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-head">
+            <span>自定义替换词表</span>
+            <div class="sub-actions">
+              <button id="fillSampleAliasBtn" class="btn-mini-outline" type="button">示例</button>
+              <button id="clearAliasBtn" class="btn-mini-outline" type="button">清空</button>
+            </div>
+          </div>
+          <textarea id="aliasRules" rows="4" placeholder="林屿 -> [U_NAME]&#10;小舟 -> [NICK_1]&#10;上海 -> [CITY_1]"></textarea>
+          <div class="sub-foot">
+            <span id="parsedRuleHint">已解析 0 条规则</span>
+            <span>还原表仅存本机</span>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-head">
+            <span>DOM 选择器覆盖</span>
+            <button id="resetSelectorsBtn" class="btn-mini-outline" type="button">重置</button>
+          </div>
+          <div class="adv-grid">
+            <input id="selRow" type="text" placeholder="消息行: [data-virtual-list-item-key], .ds-message" />
+            <input id="selMarkdown" type="text" placeholder="正文区: .ds-markdown" />
+            <input id="selThink" type="text" placeholder="思考区: .ds-think-content" />
+            <input id="selUser" type="text" placeholder="用户气泡: .ds-collapsible-text, .fbb737a4" />
+          </div>
+          <button id="probeSelectorsBtn" class="btn-outline" type="button">测试当前页匹配数</button>
+          <div id="probeOutput" class="probe-output"></div>
+        </div>
+      </div>
+      </div></div>
+    </details>
+  </div>
+
+  <!-- Export Toast (visual only; statusBar remains the source of truth) -->
+  <div class="toast-wrap" aria-hidden="true">
+    <div id="exportToast" class="toast">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5" /></svg>
+      <span id="exportToastMsg">已导出</span>
+    </div>
+  </div>
+
+  <script src="crypto_utils.js"></script>
+  <script src="export_core.js"></script>
+  <script src="sidepanel.js"></script>
+</body>
+</html>

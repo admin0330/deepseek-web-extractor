@@ -1,0 +1,19 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Node / packaging
+node_modules/
+dist/
+*.zip
+*.crx
+*.pem
+
+# Never commit key material or exported conversations
+*.jwk
+*.key
+*.echo
+*.restore_map.json
