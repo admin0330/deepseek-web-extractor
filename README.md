@@ -37,6 +37,9 @@
 4. 点击 **加载已解压的扩展程序**，选择本仓库根目录（即包含 `manifest.json` 的目录）。
 5. 打开或刷新任意 `https://chat.deepseek.com` 对话页：右上角出现导出胶囊；点击工具栏图标可打开侧栏。
 
+> **不想手动侧载？** 商店版正在上架，一键安装、自动更新，功能与本仓库一致。
+> 进展见 [产品站](https://admin0330.github.io/echoarchive-site/)。
+
 ### 从源码开发
 
 - 源码即产物：没有构建步骤、没有打包、没有混淆，也没有第三方运行时依赖。
@@ -95,6 +98,10 @@
 3. Turn on **Developer mode** (top-right).
 4. Click **Load unpacked** and select the repository root (the folder containing `manifest.json`).
 5. Open or reload any `https://chat.deepseek.com` conversation: the export capsule appears in the top-right corner, and the toolbar icon opens the side panel.
+
+> **Would rather not sideload?** A store build is on its way — one-click install and automatic
+> updates, with the same features as this repository.
+> Follow along on the [product site](https://admin0330.github.io/echoarchive-site/).
 
 ### Working from source
 
