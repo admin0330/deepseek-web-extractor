@@ -140,7 +140,7 @@ test("sealStealthPackage hides encryption headers/algorithms, detects tampering,
     messages: [{ role: "user", content: "我在[CITY_1]等你，[U_NAME]", thinking: "" }],
     restore_map: {
       format: "echo-restore-map-v1",
-      entries: { "[CITY_1]": "上海", "[U_NAME]": "林屿" },
+      entries: { "[CITY_1]": "某市", "[U_NAME]": "张三" },
     },
   };
 
@@ -189,29 +189,29 @@ test("pseudonymizeMessages replaces PII and custom aliases reversibly", () => {
   const messages = [
     {
       role: "user",
-      content: "我是林屿，手机13800138000，在上海等小舟。",
+      content: "我是张三，手机13800138000，在某市等小明。",
       thinking: "",
     },
     {
       role: "assistant",
-      content: "记住了，林屿，今晚上海风大。",
-      thinking: "用户林屿在上海",
+      content: "记住了，张三，今晚某市风大。",
+      thinking: "用户张三在某市",
     },
   ];
   const { messages: masked, replacedTurns, restoreMap } = EchoCrypto.pseudonymizeMessages(
     messages,
     {
       maskPii: true,
-      aliasRulesText: "林屿 -> [U_NAME]\n小舟 -> [NICK_1]\n上海 -> [CITY_1]",
+      aliasRulesText: "张三 -> [U_NAME]\n小明 -> [NICK_1]\n某市 -> [CITY_1]",
     }
   );
 
   assert.equal(replacedTurns, 2);
-  assert.equal(masked[0].content.includes("林屿"), false);
+  assert.equal(masked[0].content.includes("张三"), false);
   assert.equal(masked[0].content.includes("13800138000"), false);
   assert.equal(masked[0].content.includes("[U_NAME]"), true);
   assert.equal(masked[0].content.includes("[NICK_1]"), true);
-  assert.equal(masked[1].thinking.includes("林屿"), false);
+  assert.equal(masked[1].thinking.includes("张三"), false);
 
   const restored = EchoCrypto.restoreTextFromMap(masked[0].content, restoreMap);
   assert.equal(restored, messages[0].content);
@@ -661,8 +661,8 @@ test("Core.finalizeExport (encrypted) self-seals a decryptable .echo with embedd
     strategy: "virtual-list-key",
     exported_at: new Date().toISOString(),
     messages: [
-      { role: "user", content: "我是林屿，手机13800138000", thinking: "" },
-      { role: "assistant", content: "记住了，林屿", thinking: "用户林屿" },
+      { role: "user", content: "我是张三，手机13800138000", thinking: "" },
+      { role: "assistant", content: "记住了，张三", thinking: "用户张三" },
     ],
   };
   const saved = [];
@@ -670,7 +670,7 @@ test("Core.finalizeExport (encrypted) self-seals a decryptable .echo with embedd
     mode: "encrypted",
     extracted,
     maskPii: true,
-    aliasRulesText: "林屿 -> [U_NAME]",
+    aliasRulesText: "张三 -> [U_NAME]",
     customPass: "",
     downloader: (filename, content, mimeType) => {
       saved.push({ filename, content, mimeType });
@@ -680,7 +680,7 @@ test("Core.finalizeExport (encrypted) self-seals a decryptable .echo with embedd
   assert.equal(saved.length, 1);
   assert.match(saved[0].filename, /\.echo$/);
   // Opaque: no plaintext PII, no JSON braces, no algorithm strings leak.
-  assert.equal(saved[0].content.includes("林屿"), false);
+  assert.equal(saved[0].content.includes("张三"), false);
   assert.equal(saved[0].content.includes("13800138000"), false);
   assert.equal(saved[0].content.includes("{"), false);
 
@@ -690,7 +690,7 @@ test("Core.finalizeExport (encrypted) self-seals a decryptable .echo with embedd
 
   const decoded = await EchoCrypto.decryptPayload(saved[0].content);
   assert.equal(decoded.messages[0].content.includes("[U_NAME]"), true);
-  assert.ok(decoded.restore_map && decoded.restore_map.entries["[U_NAME]"] === "林屿");
+  assert.ok(decoded.restore_map && decoded.restore_map.entries["[U_NAME]"] === "张三");
   assert.match(status, /\.echo 加密包/);
 });
 

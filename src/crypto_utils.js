@@ -384,8 +384,8 @@
 
   /**
    * Parse user-entered alias rules like:
-   *   林屿 -> [U_NAME]
-   *   上海
+   *   张三 -> [U_NAME]
+   *   某市
    */
   function parseAliasRulesText(rawText) {
     const rules = [];

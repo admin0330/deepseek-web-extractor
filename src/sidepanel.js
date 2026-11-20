@@ -661,7 +661,7 @@
   });
 
   fillSampleAliasBtn.addEventListener("click", () => {
-    aliasRulesEl.value = "林屿 -> [U_NAME]\n小舟 -> [NICK_1]\n上海 -> [CITY_1]";
+    aliasRulesEl.value = "张三 -> [U_NAME]\n小明 -> [NICK_1]\n某市 -> [CITY_1]";
     updateAliasCounter();
     syncPrefsToStorage();
   });
